@@ -6,14 +6,12 @@ import com.matheusgermano.greenshop.util.JwtUtil;
 import com.matheusgermano.greenshop.util.PasswordUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("users")
@@ -44,12 +42,12 @@ public class UserController {
 
             return ResponseEntity.ok(generatedToken);
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.internalServerError();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<User> signUp(@RequestBody User user) throws NoSuchAlgorithmException {
+    public ResponseEntity<User> signUp(@RequestBody User user) {
         try {
             User inCountryIdAlreadyExists = usersRepository.findByInCountryId(user.getInCountryId());
             User emailAlreadyExists = usersRepository.findByEmail(user.getEmail());
@@ -65,9 +63,31 @@ public class UserController {
             user.setPassword(passwordUtil.encrypt(user.getPassword()));
             User createdUser = usersRepository.save(user);
 
-            return ResponseEntity.ok(createdUser);
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return (ResponseEntity<User>) ResponseEntity.internalServerError();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<User> findById(@RequestHeader String token) {
+        try {
+            boolean isTokenValid = jwtUtil.isValid(token);
+
+            if (!isTokenValid) {
+                return new ResponseEntity("Invalid token", HttpStatus.FORBIDDEN);
+            }
+
+            String userId = jwtUtil.getTokenIdClaim(token);
+            User user = usersRepository.findById(UUID.fromString(userId)).orElse(null);
+
+            if (user == null) {
+                return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+            }
+
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
