@@ -1,4 +1,4 @@
-package com.matheusgermano.greenshop.util;
+package com.matheusgermano.greenshop.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -8,8 +8,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.matheusgermano.greenshop.models.User;
 import org.springframework.stereotype.Service;
-
-import java.security.SignatureException;
 
 @Service
 public class JwtUtil {
@@ -39,7 +37,6 @@ public class JwtUtil {
         try {
             DecodedJWT jwt = JWT.decode(token);
             String tokenIdClaim = jwt.getClaim("id").asString();
-
 
             return tokenIdClaim;
         } catch (JWTDecodeException exception){

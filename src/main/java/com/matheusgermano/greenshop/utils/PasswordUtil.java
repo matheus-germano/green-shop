@@ -1,4 +1,4 @@
-package com.matheusgermano.greenshop.util;
+package com.matheusgermano.greenshop.utils;
 
 import org.springframework.stereotype.Service;
 

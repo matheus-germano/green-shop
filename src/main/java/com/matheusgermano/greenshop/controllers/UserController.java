@@ -1,14 +1,13 @@
-package com.matheusgermano.greenshop.controller;
+package com.matheusgermano.greenshop.controllers;
 
 import com.matheusgermano.greenshop.models.User;
 import com.matheusgermano.greenshop.repositories.UsersRepository;
-import com.matheusgermano.greenshop.util.JwtUtil;
-import com.matheusgermano.greenshop.util.PasswordUtil;
+import com.matheusgermano.greenshop.utils.JwtUtil;
+import com.matheusgermano.greenshop.utils.PasswordUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -61,7 +60,7 @@ public class UserController {
             }
 
             user.setPassword(passwordUtil.encrypt(user.getPassword()));
-            User createdUser = usersRepository.save(user);
+            usersRepository.save(user);
 
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
@@ -69,7 +68,7 @@ public class UserController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/authenticated")
     public ResponseEntity<User> findById(@RequestHeader String token) {
         try {
             boolean isTokenValid = jwtUtil.isValid(token);
